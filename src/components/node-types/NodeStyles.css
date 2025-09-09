@@ -1,0 +1,28 @@
+.node {
+    background-color: black;
+    padding: 10px 20px;
+    border-radius: 5px;
+    width: 150px;
+}
+
+.node textarea {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+    text-align: center;
+    pointer-events: auto;
+}
+
+.details-panel {
+    background-color: gray;
+    position: absolute;
+    top: 60px;
+}
+
+.details-panel textarea {
+    border: none;
+    resize: none;
+}

@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color: #f6f6f6;
+  background-color: #2f2f2f;
+}
+
+#root {
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-rows: 60px 1fr;
+  grid-template-columns: 150px 1fr 150px;
+  grid-template-areas:
+    "header header header"
+    "left   main   right";
+  transition: grid-template-columns 0.3s ease;
+}
+
+header {
+  grid-area: header;
+  background: #3f51b5;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+main {
+  grid-area: main;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(52, 52, 54);
+}
+
+aside.left {
+  grid-area: left;
+  background: black;
+  padding: 1rem;
+  overflow: auto;
+  transition: width 0.3s ease;
+}
+
+aside.right {
+  grid-area: right;
+  background: black;
+  padding: 1rem;
+  overflow: auto;
+  transition: width 0.3s ease;
+}
+
+/* Collapsed state */
+.collapsed-left {
+  grid-template-columns: 0 1fr 250px;
+}
+
+.collapsed-right {
+  grid-template-columns: 250px 1fr 0;
+}
+
+.collapsed-both {
+  grid-template-columns: 0 1fr 0;
+}
