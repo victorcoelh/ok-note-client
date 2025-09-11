@@ -28,7 +28,7 @@ export default function Editor() {
         nodesDraggable
         fitView
       >
-        <Background />
+        <Background bgColor={"#FFFFFF"}/>
         <Controls />
       </ReactFlow>
     </main>

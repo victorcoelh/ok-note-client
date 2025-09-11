@@ -31,9 +31,9 @@ export default function LabelNode(props: NodeProps<Node<NodeData>>) {
 
   return (
     <>
-      <NodeToolbar>
-        <button>delete</button>
-        <button onClick={onClick} className="bg-gray-900">
+      <NodeToolbar >
+        <button className="mx-5">delete</button>
+        <button onClick={onClick} className="mx-5">
           add
         </button>
       </NodeToolbar>
@@ -46,24 +46,13 @@ export default function LabelNode(props: NodeProps<Node<NodeData>>) {
             placeholder="New node"
             value={data.label}
             onInput={onChange}
+            className="flex"
           />
         </div>
       </div>
 
       <Handle id="a" type="target" position={Position.Top} />
       <Handle id="b" type="source" position={Position.Bottom} />
-
-      {/* Details panel */}
-      {isSelected && (
-        <div className="details-panel">
-          <h4>{data.label}</h4>
-          <textarea
-            value={data.text}
-            onChange={(e) => updateNodeData(id, { text: e.target.value })}
-            className="w-full border p-1"
-          />
-        </div>
-      )}
     </>
   );
 }
