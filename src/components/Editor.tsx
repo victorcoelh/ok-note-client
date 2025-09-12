@@ -2,7 +2,7 @@ import { ReactFlow, Background, Controls } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
 import useStore from "../models/store";
-import nodeTypes from "../components/node-types/nodeTypes";
+import { nodeTypes } from "../components/node-types/nodeTypes";
 
 export default function Editor() {
   const nodes = useStore((state) => state.nodes);

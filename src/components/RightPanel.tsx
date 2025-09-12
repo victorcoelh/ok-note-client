@@ -1,40 +1,73 @@
+import useStore from "@/models/store";
 import { Sparkles, Send } from "lucide-react";
 
 export default function RightPanel() {
+  const rightPanelMode = useStore((state) => state.rightPanelMode);
+
   return (
     <aside className="right">
-      <div className="flex justify-center items-center bg-gray-500 p-1 rounded-xl m-4">
-        <button className="section-button selected">Node Details</button>
-        <button className="section-button">AI Chat</button>
-      </div>
-
-      <ChatBotPanel />
+      <SelectionButtons />
+      {rightPanelMode === "details" ? <DetailsPanel /> : <ChatBotPanel />}
     </aside>
   );
 }
 
-function DetailsPanel() {
+function SelectionButtons() {
+  const rightPanelMode = useStore((state) => state.rightPanelMode);
+  const setRightPanelMode = useStore((state) => state.setRightPanelMode);
+
+  const isDetailsMode = rightPanelMode === "details";
+
   return (
-    <>
-      <div className="flex justify-between mt-10">
-        <h2 className="font-bold">Platão</h2>
-        <div className="border rounded-lg text-xs font-bold border-ring/50 py-0.5 px-2 items-center flex">
+    <div className="flex justify-center items-center bg-secondary p-1 rounded-xl m-4">
+      <button
+        className={isDetailsMode ? "section-button selected" : "section-button"}
+        onClick={() => setRightPanelMode("details")}
+      >
+        Node Details
+      </button>
+
+      <button
+        className={isDetailsMode ? "section-button" : "section-button selected"}
+        onClick={() => setRightPanelMode("chat")}
+      >
+        AI Chat
+      </button>
+    </div>
+  );
+}
+
+function DetailsPanel() {
+  const selectedNode = useStore((state) => state.selectedNode);
+  const nodes = useStore((state) => state.nodes);
+  const updateNodeData = useStore((state) => state.updateNodeData);
+
+  const selectedNodeData = nodes.find((node) => node.id === selectedNode)?.data;
+
+  return (
+    <div className="mx-4">
+      <div className="flex justify-between mt-6">
+        <h2 className="font-bold">{selectedNodeData?.label}</h2>
+        <div className="border rounded-lg text-xs font-bold border-sidebar-border py-0.5 px-2 items-center flex">
           Text Node
         </div>
       </div>
 
       <h3 className="mt-2 font-bold text-sm my-1">Content</h3>
       <textarea
-        className="bg-ring rounded w-full resize-none p-2 outline-none mb-5"
+        className="bg-input-background rounded-lg w-full resize-none p-2 outline-none mb-5 text-sm"
         placeholder="Enter description..."
+        value={selectedNodeData?.text}
+        onChange={(e) => {updateNodeData(selectedNode!, { text: e.target.value })}}
+        rows={20}
       />
 
-      <div className="bg-background p-5 rounded-lg border-ring/50 border-1">
+      <div className="bg-background p-5 rounded-lg border-sidebar-border border-1">
         <h3 className="mb-5">Node Settings</h3>
         <h3>Color</h3>
         <div className="bg-blue-200 w-8 h-8 rounded-lg border-1 border-ring/40"></div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -56,10 +89,10 @@ function ChatBotPanel() {
         <input
           type="text"
           placeholder="Ask questions about your graph!"
-          className="bg-ring rounded-lg w-full resize-none py-1.5 px-3 text-sm"
+          className="bg-input-background rounded-lg w-full resize-none py-1.5 px-3 text-sm"
         />
         <div className="bg-foreground py-2 px-2.5 rounded-lg">
-          <Send size={16} className="text-white"/>
+          <Send size={16} className="text-white" />
         </div>
       </div>
     </>
@@ -68,7 +101,7 @@ function ChatBotPanel() {
 
 function ChatMessage() {
   return (
-    <div className="bg-foreground-muted rounded-lg p-3 mr-15">
+    <div className="bg-secondary rounded-lg p-3 mr-15">
       <p className="text-message">
         Hello! I'm here to help you create and modify nodes in your graph. What would you
         like to do?

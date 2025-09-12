@@ -4,25 +4,25 @@ export default function Header() {
   return (
     <header>
       <div>
-        <FolderOpen />
+        <FolderOpen size={16}/>
         <p>Open</p>
       </div>
 
       <div>
-        <Save />
+        <Save size={16}/>
         <p>Save</p>
       </div>
 
       <div>
-        <Undo />
+        <Undo size={16}/>
       </div>
 
       <div>
-        <Redo />
+        <Redo size={16}/>
       </div>
 
       <div id="settings">
-        <Settings />
+        <Settings size={16}/>
       </div>
     </header>
   );

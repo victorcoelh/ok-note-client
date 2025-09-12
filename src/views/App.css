@@ -1,54 +1,8 @@
 @import "tailwindcss";
+@import "@/colors.css";
 
 * {
   box-sizing: border-box;
-}
-
-:root {
-  --foreground: oklch(0.145 0 0);
-  --foreground-muted: oklch(0.5546 0.0261 285.52);
-  --background: oklch(1 0 0);
-  --background-muted: oklch(0.9442 0.0053 286.3);
-
-  --primary: oklch(0.1074 0.0447 280.7);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --ring: oklch(0.708 0 0);
-  --border: rgba(0, 0, 0, 0.1);
-  --switch-background: oklch(0.8508 0.0089 264.52);
-
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-}
-
-@theme inline {
-  /* map to the --color-* namespace so utilities are like bg-foreground, text-foreground */
-  --color-foreground: var(--foreground);
-  --color-foreground-muted: var(--foreground-muted);
-  --color-background: var(--background);
-  --color-background-muted: var(--background-muted);
-
-  --color-primary-500: var(--primary);
-  --color-secondary-500: var(--secondary);
-  --color-ring: var(--ring);
-  --color-border: var(--border);
-  --color-switch-background: var(--switch-background);
-
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-border: var(--sidebar-border);
-
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
 }
 
 #root {
@@ -57,7 +11,7 @@
   width: 100vw;
   display: grid;
   grid-template-rows: 50px 1fr;
-  grid-template-columns: 250px 1fr 325px;
+  grid-template-columns: 300px 1fr 500px;
   grid-template-areas:
     "header header header"
     "left   main   right";
@@ -73,7 +27,8 @@ header {
   grid-area: header;
   background: var(--background);
   color: var(--foreground);
-  border-bottom: 1px solid var(--border);
+  filter: drop-shadow(0 1px 1px var(--sidebar-border));
+  border-bottom: 1px solid var(--sidebar-border);
   display: flex;
   align-items: center;
   padding: 5px 15px;
@@ -100,19 +55,19 @@ main {
 }
 
 aside {
-  background: var(--background-muted);
-  overflow: auto;
+  background: var(--sidebar-muted);
+  overflow: hidden;
   transition: width 0.3s ease;
 }
 
 aside.left {
   grid-area: left;
-  border-right: 2px solid var(--border);
+  border-right: 1px solid var(--sidebar-border);
 }
 
 aside.right {
   grid-area: right;
-  border-left: 2px solid var(--border);
+  border-left: 1px solid var(--sidebar-border);
 }
 
 .node {

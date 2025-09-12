@@ -1,11 +1,13 @@
-import { ArrowLeft, Square } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
+import { nodeTypes, nodeProperties } from "./node-types/nodeTypes";
+import React from "react";
 
 export default function LeftPanel() {
   return (
-    <aside className="left overflow-hidden">
-      <div className="flex items-center bg-sidebar py-2 px-2 sticky">
+    <aside className="left">
+      <div className="flex items-center p-3 bg-background w-full border-b-1 border-sidebar-border">
         <p>Toolbox</p>
-        <ArrowLeft size={16} className="ml-auto" />
+        <ChevronLeft size={16} className="ml-auto mr-2" />
       </div>
 
       <NodeList />
@@ -14,28 +16,31 @@ export default function LeftPanel() {
 }
 
 function NodeList() {
-  const nodeTypes = [1, 2, 3, 4, 5];
+  const nodeTypesKeys = Object.keys(nodeTypes) as Array<keyof typeof nodeTypes>;
 
   return (
     <ul className="p-3 overflow-y-auto">
-      {nodeTypes.map(() => {
-        return <NodeType />;
-      })}
+      {nodeTypesKeys.map((key) => <NodeType nodeKey={key} />)}
     </ul>
   );
 }
 
-function NodeType() {
+function NodeType({ nodeKey }: { nodeKey: keyof typeof nodeTypes }) {
+  const nodeElement = nodeTypes[nodeKey];
+  const { name, description, icon, nodeColor, bgColor } = nodeProperties[nodeKey];
+
+  console.log(`bg-${bgColor} text-${nodeColor} p-2 rounded-lg`)
+
   return (
-    <li className="bg-sidebar-accent rounded-lg p-3 flex items-center gap-3 my-2">
-      <div className="bg-blue-300 text-blue-800 p-2 rounded-lg">
-        <Square size={18} />
+    <li className="bg-card rounded-lg p-3 flex items-center gap-3 my-2">
+      <div className={`${bgColor} ${nodeColor} p-2 rounded-lg`}>
+        {React.createElement(icon)}
       </div>
 
       <div>
-        <p className="mb-1">Input Node</p>
-        <div className="text-sm bg-ring rounded-lg py-1.5 px-2">
-          <p className="node-text">Drag to Canvas</p>
+        <p className="mb-1">{name}</p>
+        <div className="text-sm bg-secondary text-secondary-foreground rounded-lg py-1.5 px-2">
+          <p className="node-text">{description}</p>
         </div>
       </div>
     </li>

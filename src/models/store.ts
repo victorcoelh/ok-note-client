@@ -16,6 +16,7 @@ interface EditorState {
   nodes: Array<Node<NodeData>>;
   edges: Array<Edge>;
   selectedNode: string | null;
+  rightPanelMode: "details" | "chat";
 
   setNodes: (changes: Array<NodeChange<Node<NodeData>>>) => void;
   updateNodeData: (id: string, data: Partial<NodeData>) => void;
@@ -25,12 +26,14 @@ interface EditorState {
   addEdge: (params: Edge | Connection) => void;
 
   setSelectedNode: (id: string | null) => void;
+  setRightPanelMode: (mode: "details" | "chat") => void;
 }
 
 const useStore = create<EditorState>()((set) => ({
   nodes: [getDefaultNode()],
   edges: [],
   selectedNode: null,
+  rightPanelMode: "details",
 
   setNodes: (changes) => set((state) => ({ nodes: applyNodeChanges(changes, state.nodes) })),
 
@@ -51,7 +54,9 @@ const useStore = create<EditorState>()((set) => ({
 
   addEdge: (params) => set((state) => ({ edges: addEdge(params, state.edges) })),
 
-  setSelectedNode: (id) => set((_state) => ({ selectedNode: id }))
+  setSelectedNode: (id) => set((_state) => ({ selectedNode: id })),
+
+  setRightPanelMode: (mode) => set((_state) => ({ rightPanelMode: mode })),
 }));
 
 export default useStore;
