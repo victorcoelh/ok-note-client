@@ -1,13 +1,29 @@
 import useStore from "@/models/store";
-import { Sparkles, Send } from "lucide-react";
+import { Sparkles, Send, ChevronRight } from "lucide-react";
 
 export default function RightPanel() {
   const rightPanelMode = useStore((state) => state.rightPanelMode);
+  const rightPanelCollapsed = useStore((state) => state.rightPanelCollapsed);
+  const setRightPanelCollapsed = useStore((state) => state.setRightPanelCollapsed);
+
+  const collapsePanel = () => setRightPanelCollapsed(!rightPanelCollapsed)
 
   return (
     <aside className="right">
-      <SelectionButtons />
-      {rightPanelMode === "details" ? <DetailsPanel /> : <ChatBotPanel />}
+      <div className="flex items-center p-3 bg-background w-full border-b-1 border-sidebar-border">
+        <p hidden={rightPanelCollapsed}>Properties</p>
+        <ChevronRight
+          size={16}
+          className={`ml-auto mr-2 transition-transform duration-300 ${
+            rightPanelCollapsed ? "rotate-180" : ""
+          }`}
+          onClick={collapsePanel}
+        />
+      </div>
+      <div hidden={rightPanelCollapsed}>
+        <SelectionButtons />
+        {rightPanelMode === "details" ? <DetailsPanel /> : <ChatBotPanel />}
+      </div>
     </aside>
   );
 }

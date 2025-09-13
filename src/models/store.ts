@@ -17,16 +17,22 @@ interface EditorState {
   edges: Array<Edge>;
   selectedNode: string | null;
   rightPanelMode: "details" | "chat";
+  leftPanelCollapsed: boolean;
+  rightPanelCollapsed: boolean;
 
   setNodes: (changes: Array<NodeChange<Node<NodeData>>>) => void;
   updateNodeData: (id: string, data: Partial<NodeData>) => void;
   addNode: (newNode: Node<NodeData>) => void;
+  deleteNode: (id: string) => void;
 
   setEdges: (changes: Array<EdgeChange<Edge>>) => void;
   addEdge: (params: Edge | Connection) => void;
 
   setSelectedNode: (id: string | null) => void;
   setRightPanelMode: (mode: "details" | "chat") => void;
+
+  setLeftPanelCollapsed: (collapsed: boolean) => void;
+  setRightPanelCollapsed: (collapsed: boolean) => void;
 }
 
 const useStore = create<EditorState>()((set) => ({
@@ -34,8 +40,11 @@ const useStore = create<EditorState>()((set) => ({
   edges: [],
   selectedNode: null,
   rightPanelMode: "details",
+  leftPanelCollapsed: false,
+  rightPanelCollapsed: false,
 
-  setNodes: (changes) => set((state) => ({ nodes: applyNodeChanges(changes, state.nodes) })),
+  setNodes: (changes) =>
+    set((state) => ({ nodes: applyNodeChanges(changes, state.nodes) })),
 
   updateNodeData: (id, data) =>
     set((state) => ({
@@ -50,13 +59,23 @@ const useStore = create<EditorState>()((set) => ({
       return { nodes: [...state.nodes, newNode] };
     }),
 
-  setEdges: (changes) => set((state) => ({ edges: applyEdgeChanges(changes, state.edges) })),
+  deleteNode: (id) =>
+    set((state) => ({ nodes: state.nodes.filter((node) => node.id !== id) })),
+
+  setEdges: (changes) =>
+    set((state) => ({ edges: applyEdgeChanges(changes, state.edges) })),
 
   addEdge: (params) => set((state) => ({ edges: addEdge(params, state.edges) })),
 
   setSelectedNode: (id) => set((_state) => ({ selectedNode: id })),
 
   setRightPanelMode: (mode) => set((_state) => ({ rightPanelMode: mode })),
+
+  setLeftPanelCollapsed: (collapsed) =>
+    set((_state) => ({ leftPanelCollapsed: collapsed })),
+
+  setRightPanelCollapsed: (collapsed) =>
+    set((_state) => ({ rightPanelCollapsed: collapsed })),
 }));
 
 export default useStore;
