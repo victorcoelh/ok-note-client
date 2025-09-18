@@ -1,10 +1,17 @@
 import {
+  type Node,
   ReactFlow,
   ReactFlowProvider,
   Background,
   Controls,
   useReactFlow,
-  type Node,
+  NodeChange,
+  Edge,
+  applyNodeChanges,
+  applyEdgeChanges,
+  EdgeChange,
+  addEdge,
+  Connection,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -29,44 +36,49 @@ function Flow() {
 
   const setNodes = useStore((state) => state.setNodes);
   const setEdges = useStore((state) => state.setEdges);
-  const addNode = useStore((state) => state.addNode);
-  const addEdge = useStore((state) => state.addEdge);
   const setSelectedNode = useStore((state) => state.setSelectedNode);
 
   const { screenToFlowPosition } = useReactFlow();
 
-  const onDrop = useCallback(
-    (event: React.DragEvent) => {
-      event.preventDefault();
+  const onDrop = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
 
-      const data = event.dataTransfer.getData("application/reactflow");
-      if (!data) return;
+    const data = event.dataTransfer.getData("application/reactflow");
+    if (!data) return;
 
-      const nodeType = data as keyof typeof nodeTypes;
+    const nodeType = data as keyof typeof nodeTypes;
+    const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+    const newNode: Node<NodeData> = {
+      ...getDefaultNode(),
+      type: nodeType,
+      position: position,
+    };
 
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
+    setNodes((nodes) => nodes.push(newNode));
+  }, []);
 
-      const newNode: Node<NodeData> = {
-        ...getDefaultNode(),
-        type: nodeType,
-        position: position,
-      }
-      addNode(newNode);
-    },
-    [screenToFlowPosition]
-  );
+  const onNodesChange = useCallback((changes: Array<NodeChange<Node<NodeData>>>) => {
+    const newNodes = applyNodeChanges(changes, nodes.value);
+    setNodes((nodes) => nodes.replace(newNodes));
+  }, []);
+
+  const onEdgesChange = useCallback((changes: Array<EdgeChange<Edge>>) => {
+    const newEdges = applyEdgeChanges(changes, edges.value);
+    setEdges((edges) => edges.replace(newEdges));
+  }, []);
+
+  const onConnect = useCallback((params: Edge | Connection) => {
+    setEdges((immutable) => immutable.update((edges) => addEdge(params, edges)));
+  }, []);
 
   return (
     <ReactFlow
-      nodes={nodes}
-      edges={edges}
+      nodes={nodes.value}
+      edges={edges.value}
       nodeTypes={nodeTypes}
-      onNodesChange={setNodes}
-      onEdgesChange={setEdges}
-      onConnect={addEdge}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onConnect={onConnect}
       onNodeClick={(_event, node) => setSelectedNode(node.id)}
       onPaneClick={() => setSelectedNode(null)}
       onDrop={onDrop}

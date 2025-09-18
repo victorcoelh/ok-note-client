@@ -1,41 +1,56 @@
-use tauri::State;
-
-use crate::{node::Node, state::AppState};
+use std::fs::File;
+use std::io::{Read, Write};
+use std::path::PathBuf;
 
 #[tauri::command]
-pub async fn create_node(state: State<'_, AppState>, name: &str) -> Result<(), String> {
-    state
-        .graph
-        .lock()
-        .as_mut()
-        .map_err(|err| err.to_string())
-        .and_then(|graph| Ok(graph.create_node(name)))
+#[specta::specta]
+pub async fn save_graph(data: &str, path: &str) -> Result<(), String> {
+    let mut file_path = PathBuf::from(path);
+    file_path.set_extension(".json");
+
+    let mut file = File::create(file_path).map_err(|e| e.to_string())?;
+    file.write_all(data.as_bytes()).map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 #[tauri::command]
-pub async fn pop_node(state: State<'_, AppState>, index: u32) -> Result<Node, String> {
-    state
-        .graph
-        .lock()
-        .as_mut()
-        .map_err(|err| err.to_string())
-        .and_then(|graph| graph.delete_node(index))
+#[specta::specta]
+pub async fn load_graph(path: &str) -> Result<String, String> {
+    let mut file = File::open(path).map_err(|e| e.to_string())?;
+    let mut contents = String::new();
+
+    file.read_to_string(&mut contents)
+        .map_err(|e| e.to_string())?;
+
+    Ok(contents)
 }
 
 #[tauri::command]
-pub async fn create_edge(state: State<'_, AppState>, from: u32, to: u32) -> Result<(), String> {
-    state
-        .graph
-        .lock()
-        .as_mut()
-        .map_err(|err| err.to_string())
-        .and_then(|graph| graph.create_edge(from, to))
+#[specta::specta]
+pub async fn answer_question(question: &str, data: &str) -> Result<String, String> {
+    let client = reqwest::Client::new();
+
+    let res = client
+        .post("http://localhost:8080/llm/summarize")
+        .body(data.to_string())
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(res.text().await.map_err(|e| e.to_string())?)
 }
 
 #[tauri::command]
-pub async fn read_graph(state: State<'_, AppState>) -> Result<serde_json::Value, String> {
-    let graph_guard = state.graph.lock().map_err(|err| err.to_string())?;
 
-    serde_json::to_value(&*graph_guard)
-        .map_err(|err| format!("Serialization error: {}", err))
+pub async fn suggest_node(data: &str) -> Result<String, String> {
+    let client = reqwest::Client::new();
+
+    let res = client
+        .post("http://localhost:8080/summarize")
+        .body(data.to_string())
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(res.text().await.map_err(|e| e.to_string())?)
 }

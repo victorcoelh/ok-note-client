@@ -7,12 +7,12 @@ export type NodeData = {
 
 export function getDefaultNode(): Node<NodeData> {
   return {
-    id: "temp",
+    id: "0",
     type: "label",
     position: { x: 0, y: 0 },
     data: {
       label: "New node",
-      text: "Lorem ipsum Dolor",
+      text: "",
     },
   }
 }

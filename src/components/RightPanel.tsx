@@ -1,12 +1,16 @@
+import getDataFromState from "@/getNodesFromState";
+import ChatMessage from "@/models/chatMessage";
 import useStore from "@/models/store";
+import { invoke } from "@tauri-apps/api/core";
 import { Sparkles, Send, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 export default function RightPanel() {
   const rightPanelMode = useStore((state) => state.rightPanelMode);
   const rightPanelCollapsed = useStore((state) => state.rightPanelCollapsed);
   const setRightPanelCollapsed = useStore((state) => state.setRightPanelCollapsed);
 
-  const collapsePanel = () => setRightPanelCollapsed(!rightPanelCollapsed)
+  const collapsePanel = () => setRightPanelCollapsed(!rightPanelCollapsed);
 
   return (
     <aside className="right">
@@ -57,8 +61,9 @@ function DetailsPanel() {
   const selectedNode = useStore((state) => state.selectedNode);
   const nodes = useStore((state) => state.nodes);
   const updateNodeData = useStore((state) => state.updateNodeData);
+  const selectedNodeData = nodes.value.find((node) => node.id === selectedNode)?.data;
 
-  const selectedNodeData = nodes.find((node) => node.id === selectedNode)?.data;
+  if (selectedNode === null) return <DetailsNoNode />;
 
   return (
     <div className="mx-4">
@@ -74,7 +79,9 @@ function DetailsPanel() {
         className="bg-input-background rounded-lg w-full resize-none p-2 outline-none mb-5 text-sm"
         placeholder="Enter description..."
         value={selectedNodeData?.text}
-        onChange={(e) => {updateNodeData(selectedNode!, { text: e.target.value })}}
+        onChange={(e) => {
+          updateNodeData(selectedNode!, { text: e.target.value });
+        }}
         rows={20}
       />
 
@@ -87,7 +94,43 @@ function DetailsPanel() {
   );
 }
 
+function DetailsNoNode() {
+  return (
+    <div className="text-center">
+      <h2 className="font-normal text-muted-foreground">No node selected</h2>
+      <h6 className="text-muted-foreground mt-4 text-sm">
+        Click on a node in the canvas to view and edit its properties
+      </h6>
+    </div>
+  );
+}
+
 function ChatBotPanel() {
+  const chatMessages = useStore((state) => state.chatMessages);
+  const pushMessage = useStore((state) => state.pushMessage);
+
+  const [inputText, setInputText] = useState("");
+
+  const onButtonClick = async () => {
+    pushMessage({
+      sender: "user",
+      content: inputText,
+    });
+    setInputText("");
+
+    const bot_answer = await invoke("answer_question", {
+      question: inputText,
+      data: getDataFromState(useStore.getState()),
+    }).catch((error) => console.log(error));
+
+    console.log(getDataFromState(useStore.getState()))
+
+    pushMessage({
+      sender: "bot",
+      content: bot_answer as string,
+    });
+  };
+
   return (
     <>
       <div className="flex items-center gap-2 mx-4 mt-6">
@@ -97,31 +140,39 @@ function ChatBotPanel() {
 
       <p className="subtext mx-4 mt-1">Get help with your graph</p>
 
-      <div className="my-5 border-y-1 border-ring/50 py-5 px-4">
-        <ChatMessage />
-      </div>
+      <ul className="my-5 border-y-1 border-ring/50 py-3 px-4">
+        {chatMessages.map((message) => (
+          <ChatBubble message={message} />
+        ))}
+      </ul>
 
       <div className="mx-4 flex items-center gap-2">
         <input
           type="text"
+          value={inputText}
           placeholder="Ask questions about your graph!"
           className="bg-input-background rounded-lg w-full resize-none py-1.5 px-3 text-sm"
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyDown={(e) => (e.key === "Enter" ? onButtonClick() : null)}
         />
-        <div className="bg-foreground py-2 px-2.5 rounded-lg">
+        <button className="bg-foreground py-2 px-2.5 rounded-lg" onClick={onButtonClick}>
           <Send size={16} className="text-white" />
-        </div>
+        </button>
       </div>
     </>
   );
 }
 
-function ChatMessage() {
+function ChatBubble({ message }: { message: ChatMessage }) {
+  const isBotMessage = message.sender === "bot";
+
+  const bubbleClass = isBotMessage
+    ? "bg-secondary rounded-lg p-3 mr-15 my-2"
+    : "bg-ring/50 rounded-lg p-3 ml-15 my-2";
+
   return (
-    <div className="bg-secondary rounded-lg p-3 mr-15">
-      <p className="text-message">
-        Hello! I'm here to help you create and modify nodes in your graph. What would you
-        like to do?
-      </p>
-    </div>
+    <li className={bubbleClass}>
+      <p className="text-message">{message.content}</p>
+    </li>
   );
 }
